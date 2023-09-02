@@ -13,7 +13,7 @@ function App() {
     useEffect(() => {
         const initData = async () => {
             const response = await axios.get(
-                `https://www.googleapis.com/books/v1/volumes?q=flowers+inauthor:keyes&maxResults=35`
+                `https://www.googleapis.com/books/v1/volumes?q=js&maxResults=35`
             );
             const data = await response.data;
             console.log('data', data);
