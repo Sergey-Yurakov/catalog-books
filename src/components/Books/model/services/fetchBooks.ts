@@ -1,28 +1,44 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { BooksData } from '../types/booksSchema';
 import axios from 'axios';
+import {
+    getBooksCategories,
+    getBooksMaxResults,
+    getBooksSearch,
+    getBooksSorting,
+    getBooksStartIndex,
+} from '../selectors/getBooks';
+import { StateSchema } from '../../../../store/StateSchema';
 
-type arg = {
-    search: string;
-    categories: string;
-    sortingBy: 'relevance' | 'newest';
-    startIndex: number;
-    maxResults?: number;
-};
+export const fetchBooks = createAsyncThunk<
+    BooksData,
+    { replace?: boolean },
+    { rejectValue: string; state: StateSchema }
+>('books/fetchBooks', async ({ replace }, thunkAPI) => {
+    const { rejectWithValue, getState } = thunkAPI;
 
-export const fetchBooks = createAsyncThunk<BooksData, arg, { rejectValue: string }>(
-    'books/fetchBooks',
-    async (arg, { rejectWithValue }) => {
-        const { categories, search, sortingBy = 'relevance', startIndex = 0, maxResults = 35 } = arg;
+    const search = getBooksSearch(getState());
+    const categories = getBooksCategories(getState());
+    const startIndex = getBooksStartIndex(getState());
+    const maxResults = getBooksMaxResults(getState());
+    const sortingBy = getBooksSorting(getState());
 
-        const { data } = await axios.get(
-            `https://www.googleapis.com/books/v1/volumes?q=${search}+subject=${categories}&startIndex=${startIndex}&maxResults=${maxResults}&orderBy=${sortingBy}`
-        );
+    try {
+        const { data } = await axios.get<BooksData>('https://www.googleapis.com/books/v1/volumes?', {
+            params: {
+                q: `${search}+subject=${categories}`,
+                _startIndex: startIndex,
+                _maxResults: maxResults,
+                _orderBy: sortingBy,
+            },
+        });
 
         if (!data) {
-            return rejectWithValue('Server error');
+            throw new Error();
         }
         console.log('data', data);
         return data;
+    } catch (e) {
+        return rejectWithValue('Server error: ' + e);
     }
-);
+});

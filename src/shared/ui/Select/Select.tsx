@@ -1,5 +1,6 @@
 import { ChangeEvent, memo, useMemo } from 'react';
 import { classNames as cn } from '../../lib/classNames/classNames';
+import cl from './Select.module.css';
 
 export type OptionsArray = {
     value: string;
@@ -9,9 +10,9 @@ export type OptionsArray = {
 interface SelectProps {
     options: OptionsArray[];
     value: string;
-    setValue: (value: string) => void;
     label?: string;
     className?: string;
+    setValue: (value: string) => void;
 }
 
 export const Select = memo((props: SelectProps) => {
@@ -34,7 +35,7 @@ export const Select = memo((props: SelectProps) => {
     return (
         <div>
             {label && <span>{label}</span>}
-            <select className={cn('', {}, [className])} value={value} onChange={onChange}>
+            <select className={cn(cl.select, {}, [className])} value={value} onChange={onChange}>
                 {optionList}
             </select>
         </div>

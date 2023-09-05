@@ -1,0 +1,29 @@
+.wrapper {
+    padding: 16px;
+    background-color: #f6f2f2;
+    border-radius: 8px;
+}
+.img {
+    margin: 0 auto;
+    width: 135px;
+    height: 180px;
+}
+
+.img img {
+    width: 100%;
+    height: 100%;
+}
+
+.content {
+    margin-top: 32px;
+}
+
+.category {
+    color: #939292;
+    text-decoration: underline;
+    margin-bottom: 16px;
+}
+
+.title {
+    margin-bottom: 16px;
+}

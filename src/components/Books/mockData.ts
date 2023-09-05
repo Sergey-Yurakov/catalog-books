@@ -1,5 +1,7 @@
 import { OptionsArray } from '../../shared/ui/Select/Select';
 
+export const LIMIT = 30;
+
 export const optionsCategories: OptionsArray[] = [
     {
         value: 'all',
