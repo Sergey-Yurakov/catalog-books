@@ -7,17 +7,21 @@ import cl from './Books.module.css';
 import { useAppDispatch, useAppSelector } from '../../../shared/hooks/hookStore';
 import {
     getBooks,
-    getBooksCategories,
     getBooksError,
+    getBooksIsErrorData,
     getBooksIsLoading,
-    getBooksSearch,
-    getBooksSorting,
     getBooksTotalItems,
 } from '../model/selectors/getBooks';
 import { BooksList } from '../../BooksList';
-import { booksActions } from '../model/slices/booksSlice';
 import { fetchBooks } from '../model/services/fetchBooks';
 import { fetchBooksNextPage } from '../model/services/fetchBooksNextPage';
+import {
+    getBooksCategories,
+    getBooksIsInitialFetch,
+    getBooksSearch,
+    getBooksSorting,
+} from '../model/selectors/getFiltersBooks';
+import { filterBooksActions } from '../model/slices/filterBooksSlice';
 
 export const Books = memo(() => {
     const dispatch = useAppDispatch();
@@ -29,6 +33,8 @@ export const Books = memo(() => {
     const search = useAppSelector(getBooksSearch);
     const categories = useAppSelector(getBooksCategories);
     const sorting = useAppSelector(getBooksSorting);
+    const isInitialFetch = useAppSelector(getBooksIsInitialFetch);
+    const isErrorData = useAppSelector(getBooksIsErrorData);
 
     const [isFocused, setIsFocused] = useState(false);
 
@@ -45,22 +51,23 @@ export const Books = memo(() => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (!books) {
+        if (!isInitialFetch) {
             fetchData();
+            dispatch(filterBooksActions.setIsInitialFetch(true));
         }
-    }, [books, fetchData]);
+    }, [books, dispatch, fetchData, isInitialFetch]);
 
     const onChangeInput = useCallback(
         (value: string) => {
-            dispatch(booksActions.setSearch(value));
+            dispatch(filterBooksActions.setSearch(value));
         },
         [dispatch]
     );
 
     const onChangeSorting = useCallback(
         (value: string) => {
-            dispatch(booksActions.setSorting(value));
-            dispatch(booksActions.setStartIndex(0));
+            dispatch(filterBooksActions.setSorting(value));
+            dispatch(filterBooksActions.setStartIndex(0));
             fetchData();
         },
         [dispatch, fetchData]
@@ -68,8 +75,8 @@ export const Books = memo(() => {
 
     const onChangeCategories = useCallback(
         (value: string) => {
-            dispatch(booksActions.setCategories(value));
-            dispatch(booksActions.setStartIndex(0));
+            dispatch(filterBooksActions.setCategories(value));
+            dispatch(filterBooksActions.setStartIndex(0));
             fetchData();
         },
         [dispatch, fetchData]
@@ -77,7 +84,7 @@ export const Books = memo(() => {
 
     const onHandleLoadMore = useCallback(
         (value: boolean) => {
-            dispatch(booksActions.setIsLoadMore(value));
+            dispatch(filterBooksActions.setIsLoadMore(value));
             fetchNextPage();
         },
         [dispatch, fetchNextPage]
@@ -142,6 +149,7 @@ export const Books = memo(() => {
             </header>
 
             <BooksList
+                isErrorData={isErrorData}
                 setIsLoadMore={onHandleLoadMore}
                 isLoading={isLoading}
                 totalItems={booksTotal}

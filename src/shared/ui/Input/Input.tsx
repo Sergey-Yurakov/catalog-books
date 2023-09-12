@@ -14,7 +14,7 @@ export const Input = memo((props: InputProps) => {
     const { value, placeholder, className, setValue, setIsFocused } = props;
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
+        setValue(e.target.value.trim());
     };
 
     const onBlur = () => {
@@ -28,7 +28,7 @@ export const Input = memo((props: InputProps) => {
         <input
             className={cn(cl.input, {}, [className])}
             onChange={onChange}
-            value={value}
+            defaultValue={value}
             type="text"
             placeholder={placeholder}
             onFocus={onFocus}

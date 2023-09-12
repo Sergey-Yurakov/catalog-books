@@ -25,10 +25,5 @@ export type BooksSchema = {
     isLoading: boolean;
     error?: string;
     data: BooksData;
-    search: string;
-    categories: string;
-    sorting: string;
-    startIndex: number;
-    maxResult: number;
-    isLoadMore?: boolean;
+    isErrorData?: boolean;
 };

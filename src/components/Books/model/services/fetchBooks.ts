@@ -1,14 +1,15 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { BooksData } from '../types/booksSchema';
 import axios from 'axios';
+
+import { StateSchema } from '../../../../store/StateSchema';
 import {
     getBooksCategories,
     getBooksMaxResults,
     getBooksSearch,
     getBooksSorting,
     getBooksStartIndex,
-} from '../selectors/getBooks';
-import { StateSchema } from '../../../../store/StateSchema';
+} from '../selectors/getFiltersBooks';
 
 export const fetchBooks = createAsyncThunk<
     BooksData,
@@ -22,14 +23,16 @@ export const fetchBooks = createAsyncThunk<
     const startIndex = getBooksStartIndex(getState());
     const maxResults = getBooksMaxResults(getState());
     const sortingBy = getBooksSorting(getState());
+    const apiKey = process.env['BOOKS_API_KEY'];
 
     try {
-        const { data } = await axios.get<BooksData>('https://www.googleapis.com/books/v1/volumes?', {
+        const { data } = await axios.get<BooksData>('https://www.googleapis.com/books/v1/volumes', {
             params: {
                 q: `${search}+subject=${categories}`,
                 _startIndex: startIndex,
                 _maxResults: maxResults,
                 _orderBy: sortingBy,
+                key: apiKey,
             },
         });
 

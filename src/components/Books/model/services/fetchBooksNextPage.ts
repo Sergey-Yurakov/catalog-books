@@ -1,8 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getBooksIsLoadMore, getBooksMaxResults, getBooksStartIndex } from '../selectors/getBooks';
 import { StateSchema } from '../../../../store/StateSchema';
-import { booksActions } from '../slices/booksSlice';
 import { fetchBooks } from './fetchBooks';
+import { filterBooksActions } from '../slices/filterBooksSlice';
+import { getBooksIsLoadMore, getBooksMaxResults, getBooksStartIndex } from '../selectors/getFiltersBooks';
 
 export const fetchBooksNextPage = createAsyncThunk<void, void, { rejectValue: string; state: StateSchema }>(
     'books/fetchBooksNextPage',
@@ -14,9 +14,9 @@ export const fetchBooksNextPage = createAsyncThunk<void, void, { rejectValue: st
         const limit = getBooksMaxResults(getState());
 
         if (isLoadMore) {
-            dispatch(booksActions.setStartIndex(startIndex + limit));
+            dispatch(filterBooksActions.setStartIndex(startIndex + limit));
             dispatch(fetchBooks({}));
-            dispatch(booksActions.setIsLoadMore(false));
+            dispatch(filterBooksActions.setIsLoadMore(false));
         }
     }
 );
