@@ -1,10 +1,10 @@
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { Input } from '../../../shared/ui/Input/Input';
 import { Select } from '../../../shared/ui/Select/Select';
 import { optionsCategories, optionsSorting } from '../mockData';
 import { ReactComponent as SearchIcon } from '../../../shared/assets/search.svg';
 import cl from './Books.module.css';
-import { useAppDispatch, useAppSelector } from '../../../shared/hooks/hookStore';
+import { useAppSelector } from '../../../shared/hooks/hookStore';
 import {
     getBooks,
     getBooksError,
@@ -13,19 +13,17 @@ import {
     getBooksTotalItems,
 } from '../model/selectors/getBooks';
 import { BooksList } from '../../BooksList';
-import { fetchBooks } from '../model/services/fetchBooks';
-import { fetchBooksNextPage } from '../model/services/fetchBooksNextPage';
 import {
     getBooksCategories,
     getBooksIsInitialFetch,
     getBooksSearch,
     getBooksSorting,
 } from '../model/selectors/getFiltersBooks';
-import { filterBooksActions } from '../model/slices/filterBooksSlice';
+import { useFilters } from '../hooks/useFilters';
+import { useSearch } from '../hooks/useSearch';
+import { useLoadMore } from '../hooks/useLoadMore';
 
 export const Books = memo(() => {
-    const dispatch = useAppDispatch();
-
     const books = useAppSelector(getBooks);
     const booksTotal = useAppSelector(getBooksTotalItems);
     const isLoading = useAppSelector(getBooksIsLoading);
@@ -38,80 +36,9 @@ export const Books = memo(() => {
 
     const [isFocused, setIsFocused] = useState(false);
 
-    const fetchData = useCallback(() => {
-        dispatch(
-            fetchBooks({
-                replace: true,
-            })
-        );
-    }, [dispatch]);
-
-    const fetchNextPage = useCallback(() => {
-        dispatch(fetchBooksNextPage());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (!isInitialFetch) {
-            fetchData();
-            dispatch(filterBooksActions.setIsInitialFetch(true));
-        }
-    }, [books, dispatch, fetchData, isInitialFetch]);
-
-    const onChangeInput = useCallback(
-        (value: string) => {
-            dispatch(filterBooksActions.setSearch(value));
-        },
-        [dispatch]
-    );
-
-    const onChangeSorting = useCallback(
-        (value: string) => {
-            dispatch(filterBooksActions.setSorting(value));
-            dispatch(filterBooksActions.setStartIndex(0));
-            fetchData();
-        },
-        [dispatch, fetchData]
-    );
-
-    const onChangeCategories = useCallback(
-        (value: string) => {
-            dispatch(filterBooksActions.setCategories(value));
-            dispatch(filterBooksActions.setStartIndex(0));
-            fetchData();
-        },
-        [dispatch, fetchData]
-    );
-
-    const onHandleLoadMore = useCallback(
-        (value: boolean) => {
-            dispatch(filterBooksActions.setIsLoadMore(value));
-            fetchNextPage();
-        },
-        [dispatch, fetchNextPage]
-    );
-
-    const onKeyDown = useCallback(
-        (e: KeyboardEvent) => {
-            if (e.key === 'Enter' && search && isFocused) {
-                fetchData();
-            }
-        },
-        [fetchData, isFocused, search]
-    );
-
-    useEffect(() => {
-        document.addEventListener('keydown', onKeyDown);
-
-        return () => {
-            document.removeEventListener('keydown', onKeyDown);
-        };
-    }, [onKeyDown]);
-
-    const clickHandle = () => {
-        if (search) {
-            fetchData();
-        }
-    };
+    const { onChangeInput, fetchData, clickHandle } = useSearch({ search, isFocused, isInitialFetch });
+    const { onChangeSorting, onChangeCategories } = useFilters(fetchData);
+    const { onHandleLoadMore } = useLoadMore();
 
     return (
         <>
