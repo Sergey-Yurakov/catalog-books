@@ -17,8 +17,6 @@ type BooksListProps = {
 export const BooksList = memo((props: BooksListProps) => {
     const { isLoading, error, books, isErrorData, totalItems, setIsLoadMore } = props;
 
-    // const totalItems = 50;
-
     const clickHandle = () => {
         setIsLoadMore(true);
     };
